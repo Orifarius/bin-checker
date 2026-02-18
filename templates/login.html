@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pl" data-bs-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dostęp VPSTools</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💳</text></svg>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #0d1117;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .btn-primary {
+            background-color: #238636;
+            border-color: #238636;
+        }
+
+        .btn-primary:hover {
+            background-color: #2ea043;
+            border-color: #2ea043;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card login-card p-4">
+        <h4 class="text-center text-white mb-4">VPSTools Login</h4>
+        {% if error %}
+        <div class="alert alert-danger p-2 text-center small mb-3">{{ error }}</div>
+        {% endif %}
+        <form method="POST">
+            <input type="password" name="password"
+                class="form-control bg-dark text-white border-secondary mb-3 text-center" placeholder="Hasło dostępu"
+                required autofocus>
+            <button type="submit" class="btn btn-primary w-100 fw-bold">Zaloguj</button>
+        </form>
+    </div>
+</body>
+
+</html>

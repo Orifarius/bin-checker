@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pl" data-bs-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIN Checker | VPSTools</title>
+
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💳</text></svg>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            padding-top: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+        }
+
+        .card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+        }
+
+        .form-control {
+            background-color: #0d1117;
+            border-color: #30363d;
+            color: #c9d1d9;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+
+        .form-control:focus {
+            background-color: #0d1117;
+            border-color: #58a6ff;
+            color: #c9d1d9;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
+        }
+
+        .btn-check-bin {
+            background-color: #238636;
+            color: white;
+            border: 1px solid rgba(27, 31, 35, 0.15);
+            transition: all 0.2s;
+        }
+
+        .btn-check-bin:hover {
+            background-color: #2ea043;
+            transform: translateY(-1px);
+        }
+
+        .btn-check-bin:active {
+            transform: translateY(0);
+        }
+
+        .data-label {
+            color: #8b949e;
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .data-value {
+            font-size: 1.1em;
+            font-weight: 500;
+            color: #fff;
+            word-break: break-word;
+        }
+
+        .header-bar {
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 0.9em;
+            color: #58a6ff;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 5px;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-result {
+            animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .loading-spinner {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container pb-5">
+        <div class="d-flex justify-content-between align-items-center header-bar">
+            <h3 class="m-0"><i class="fa-solid fa-credit-card me-2 text-primary"></i>BIN Checker</h3>
+            <a href="/logout" class="btn btn-sm btn-outline-danger border-secondary text-secondary">Wyloguj</a>
+        </div>
+
+        <div class="card p-4 mb-4 shadow-sm">
+            <form method="POST" autocomplete="off" id="binForm">
+                <label class="mb-2 text-muted small">Wpisz pierwsze 6 lub 8 cyfr karty</label>
+                <div class="input-group input-group-lg">
+                    <input type="text" inputmode="numeric" pattern="[0-9]*" name="bin_code"
+                        class="form-control text-center fw-bold" placeholder="XXXXXX" value="{{ searched_bin }}"
+                        maxlength="16" autofocus id="binInput">
+
+                    <button class="btn btn-check-bin px-4 d-flex align-items-center gap-2" type="submit" id="submitBtn">
+                        <span class="btn-text">Sprawdź</span>
+                        <span class="spinner-border spinner-border-sm loading-spinner" role="status"
+                            aria-hidden="true"></span>
+                    </button>
+                </div>
+            </form>
+
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="alert alert-warning mt-3 mb-0 border-0 bg-opacity-10 bg-warning text-warning animate-result">{{
+                messages[0] }}</div>
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        {% if result %}
+        {% if result.error %}
+        <div class="alert alert-danger border-danger d-flex align-items-center animate-result">
+            <i class="fa-solid fa-circle-exclamation me-3"></i>
+            <div>{{ result.error }}</div>
+        </div>
+        {% else %}
+        <div class="card shadow-lg animate-result">
+            <div
+                class="card-header bg-transparent border-bottom border-secondary d-flex justify-content-between align-items-center py-3">
+                <span class="fw-bold text-white">Wyniki analizy</span>
+                <i class="fa-brands {{ result.icon }} fa-2x"></i>
+            </div>
+            <div class="card-body p-4">
+
+                <div class="section-title">KARTA</div>
+                <div class="row g-4 mb-4">
+                    <div class="col-md-3 col-6">
+                        <div class="data-label">Sieć (Scheme)</div>
+                        <div class="data-value text-info">{{ result.Scheme | default('-') }}</div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="data-label">Typ</div>
+                        <div class="data-value">{{ result.Type | default('-') }}</div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="data-label">Poziom (Tier)</div>
+                        <div class="data-value">{{ result.CardTier | default(result.Tier) | default('-') }}</div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="data-label">Walidacja (Luhn)</div>
+                        <div class="data-value">
+                            {% if result.Luhn %}
+                            <span class="text-success"><i class="fa-solid fa-check"></i> OK</span>
+                            {% else %}
+                            <span class="text-secondary"><i class="fa-solid fa-minus"></i> Brak</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">EMITENT</div>
+                <div class="row g-4 mb-4">
+                    <div class="col-12">
+                        <div class="data-label">Bank (Issuer)</div>
+                        <div class="data-value text-warning">{{ result.Issuer | default('-') }}</div>
+                    </div>
+                </div>
+
+                <div class="section-title">LOKALIZACJA</div>
+                <div class="row g-4">
+                    <div class="col-md-4 col-6">
+                        <div class="data-label">Kraj</div>
+                        <div class="data-value">
+                            <i class="fa-solid fa-earth-americas me-1 text-secondary"></i>
+                            {{ result.Country.Name | default('-') }}
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="data-label">Kod ISO</div>
+                        <div class="data-value">{{ result.Country.A2 }} / {{ result.Country.A3 }}</div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="data-label">Kontynent</div>
+                        <div class="data-value">{{ result.Country.Cont | default('-') }}</div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="data-label">Numer kier. (ISD)</div>
+                        <div class="data-value">+{{ result.Country.ISD | default('-') }}</div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="data-label">Waluta</div>
+                        <div class="data-value">{{ result.Currency | default('-') }}</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('binForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const spinner = submitBtn.querySelector('.loading-spinner');
+            const input = document.getElementById('binInput');
+
+            input.addEventListener('click', function () { this.select(); });
+
+            form.addEventListener('submit', function () {
+                submitBtn.disabled = true;
+                btnText.textContent = "Szukam...";
+                spinner.style.display = 'inline-block';
+            });
+        });
+    </script>
+
+</body>
+
+</html>
