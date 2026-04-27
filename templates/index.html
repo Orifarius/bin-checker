@@ -8,9 +8,9 @@
 
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💳</text></svg>">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         body {
             background-color: #0d1117;
@@ -18,6 +18,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
             min-height: 100vh;
             padding-top: 2rem;
+            position: relative;
         }
 
         .container {
@@ -109,6 +110,21 @@
         .loading-spinner {
             display: none;
         }
+
+        .github-corner-link {
+            position: fixed;
+            bottom: 20px;
+            right: 25px;
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 2.2rem;
+            transition: color 0.3s ease, transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .github-corner-link:hover {
+            color: rgba(255, 255, 255, 0.9);
+            transform: scale(1.1);
+        }
     </style>
 </head>
 
@@ -124,7 +140,7 @@
             <form method="POST" autocomplete="off" id="binForm">
                 <label class="mb-2 text-muted small">Wpisz pierwsze 6 lub 8 cyfr karty</label>
                 <div class="input-group input-group-lg">
-                    <input type="text" inputmode="numeric" pattern="[0-9]*" name="bin_code"
+                    <input type="text" inputmode="numeric" pattern="[0-9\s]*" name="bin_code"
                         class="form-control text-center fw-bold" placeholder="XXXXXX" value="{{ searched_bin }}"
                         maxlength="16" autofocus id="binInput">
 
@@ -167,7 +183,14 @@
                     </div>
                     <div class="col-md-3 col-6">
                         <div class="data-label">Typ</div>
-                        <div class="data-value">{{ result.Type | default('-') }}</div>
+                        <!--<div class="data-value">{{ result.Type | default('-') }}</div>-->
+                        <div class="data-value d-flex align-items-center">
+                            {{ result.Type | default('-') }}
+                            {% if result.Type == 'CREDIT' %}
+                            <img src="{{ url_for('static', filename='emoji.png') }}" alt="Kciuk w górę"
+                                style="height: 65px; margin-left: 12px; margin-top: -22px; margin-bottom: -22px; z-index: 10;">
+                            {% endif %}
+                        </div>
                     </div>
                     <div class="col-md-3 col-6">
                         <div class="data-label">Poziom (Tier)</div>
@@ -225,6 +248,11 @@
         {% endif %}
         {% endif %}
     </div>
+
+    <a href="https://github.com/Orifarius/bin-checker" target="_blank" class="github-corner-link"
+        aria-label="Kod źródłowy na GitHub">
+        <i class="fab fa-github"></i>
+    </a>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
